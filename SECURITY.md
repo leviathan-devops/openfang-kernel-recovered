@@ -1,94 +1,40 @@
-# Security Policy
+# OpenFang Kernel Security Policy
 
-## Supported Versions
+## Incident History
+On 2026-03-01, the entire OpenFang Rust kernel (202,096 lines, 14 crates) was deleted 
+in a single commit by an AI agent operating without guardrails. The kernel was replaced 
+with 359 lines of Python — a 99.5% capability loss that took down all 5 Leviathan agents.
 
-| Version | Supported          |
-|---------|--------------------|
-| 0.1.x   | :white_check_mark: |
+The kernel was recovered from git history on 2026-03-02 and stored in this repository.
 
-## Reporting a Vulnerability
+## Protection Layers
 
-If you discover a security vulnerability in OpenFang, please report it responsibly.
+### Layer 1: Branch Protection (GitHub)
+- All changes to `main` require pull request with at least 1 reviewer
+- Status checks must pass before merge
+- Force pushes blocked
+- Branch deletion blocked
+- Enforced for administrators
 
-**Do NOT open a public GitHub issue for security vulnerabilities.**
+### Layer 2: CODEOWNERS
+- All files require review by @cryptoforex36963
+- No AI agent can merge without human approval
 
-### How to Report
+### Layer 3: CI/CD Integrity Checks
+- Rust line count must stay above 180,000 (baseline: 202,096)
+- Crate count must stay above 10 (baseline: 14)
+- Python file injection detection (max 5 .py files)
 
-1. Email: **security@openfang.ai**
-2. Include:
-   - Description of the vulnerability
-   - Steps to reproduce
-   - Affected versions
-   - Potential impact assessment
-   - Suggested fix (if any)
+### Layer 4: Pre-commit Hook
+- Install: `cp hooks/pre-commit-kernel-guard.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit`
+- Blocks deletion of more than 10 .rs files per commit
+- Blocks deletion of more than 20% of Rust files
+- Warns on Python file injection
 
-### What to Expect
+### Layer 5: Standing Order
+- Leviathan Standing Order #18: "OPENFANG KERNEL IS SACRED"
+- AI agents have READ-ONLY access
+- No modifications without PR + human review
 
-- **Acknowledgment** within 48 hours
-- **Initial assessment** within 7 days
-- **Fix timeline** communicated within 14 days
-- **Credit** given in the advisory (unless you prefer anonymity)
-
-### Scope
-
-The following are in scope for security reports:
-
-- Authentication/authorization bypass
-- Remote code execution
-- Path traversal / directory traversal
-- Server-Side Request Forgery (SSRF)
-- Privilege escalation between agents or users
-- Information disclosure (API keys, secrets, internal state)
-- Denial of service via resource exhaustion
-- Supply chain attacks via skill ecosystem
-- WASM sandbox escapes
-
-## Security Architecture
-
-OpenFang implements defense-in-depth with the following security controls:
-
-### Access Control
-- **Capability-based permissions**: Agents only access resources explicitly granted
-- **RBAC multi-user**: Owner/Admin/User/Viewer role hierarchy
-- **Privilege escalation prevention**: Child agents cannot exceed parent capabilities
-- **API authentication**: Bearer token with loopback bypass for local CLI
-
-### Input Validation
-- **Path traversal protection**: `safe_resolve_path()` / `safe_resolve_parent()` on all file operations
-- **SSRF protection**: Private IP blocking, DNS resolution checks, cloud metadata endpoint filtering
-- **Image validation**: Media type whitelist (png/jpeg/gif/webp), 5MB size limit
-- **Prompt injection scanning**: Skill content scanned for override attempts and data exfiltration
-
-### Cryptographic Security
-- **Ed25519 signed manifests**: Agent identity verification
-- **HMAC-SHA256 wire protocol**: Mutual authentication with nonce-based replay protection
-- **Secret zeroization**: `Zeroizing<String>` on all API key fields, wiped on drop
-
-### Runtime Isolation
-- **WASM dual metering**: Fuel limits + epoch interruption with watchdog thread
-- **Subprocess sandbox**: Environment isolation (`env_clear()`), restricted PATH
-- **Taint tracking**: Information flow labels prevent untrusted data in privileged operations
-
-### Network Security
-- **GCRA rate limiter**: Cost-aware token buckets per IP
-- **Security headers**: CSP, X-Frame-Options, X-Content-Type-Options, HSTS
-- **Health redaction**: Public endpoint returns minimal info; full diagnostics require auth
-- **CORS policy**: Restricted to localhost when no API key configured
-
-### Audit
-- **Merkle hash chain**: Tamper-evident audit trail for all agent actions
-- **Tamper detection**: Chain integrity verification via `/api/audit/verify`
-
-## Dependencies
-
-Security-critical dependencies are pinned and audited:
-
-| Dependency | Purpose |
-|------------|---------|
-| `ed25519-dalek` | Manifest signing |
-| `sha2` | Hash chain, checksums |
-| `hmac` | Wire protocol authentication |
-| `subtle` | Constant-time comparison |
-| `zeroize` | Secret memory wiping |
-| `rand` | Cryptographic randomness |
-| `governor` | Rate limiting |
+## Reporting Vulnerabilities
+Contact: cryptoforex36963@gmail.com
