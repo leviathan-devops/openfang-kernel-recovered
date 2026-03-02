@@ -1,0 +1,53 @@
+name: Kernel Integrity Check
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  integrity-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Count Rust source lines
+        id: count
+        run: |
+          RUST_LINES=$(find . -name "*.rs" -exec cat {} + | wc -l)
+          echo "rust_lines=$RUST_LINES" >> $GITHUB_OUTPUT
+          echo "Rust source lines: $RUST_LINES"
+      
+      - name: Verify kernel integrity
+        run: |
+          RUST_LINES=${{ steps.count.outputs.rust_lines }}
+          if [ "$RUST_LINES" -lt 180000 ]; then
+            echo "CRITICAL: Rust kernel line count dropped below 180,000!"
+            echo "Current count: $RUST_LINES"
+            echo "Expected minimum: 180,000 (baseline: 202,096)"
+            echo "This may indicate unauthorized kernel deletion."
+            exit 1
+          fi
+          echo "Kernel integrity OK: $RUST_LINES lines (baseline: 202,096)"
+      
+      - name: Verify crate structure
+        run: |
+          CRATE_COUNT=$(find . -name "Cargo.toml" | wc -l)
+          if [ "$CRATE_COUNT" -lt 10 ]; then
+            echo "CRITICAL: Crate count dropped below 10!"
+            echo "Current: $CRATE_COUNT, Expected minimum: 10 (baseline: 14)"
+            exit 1
+          fi
+          echo "Crate structure OK: $CRATE_COUNT crates (baseline: 14)"
+      
+      - name: Check for unauthorized language replacement
+        run: |
+          PYTHON_FILES=$(find . -name "*.py" | wc -l)
+          if [ "$PYTHON_FILES" -gt 5 ]; then
+            echo "WARNING: $PYTHON_FILES Python files detected in Rust kernel repo"
+            echo "Possible language replacement attack detected"
+            exit 1
+          fi
+          echo "Language integrity OK: No unauthorized Python files"
