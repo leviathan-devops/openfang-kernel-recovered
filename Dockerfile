@@ -14,7 +14,8 @@ RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/
 COPY --from=builder /build/target/release/openfang /usr/local/bin/
 COPY --from=builder /build/agents /opt/openfang/agents
 EXPOSE 4200
-VOLUME /data
+# Railway manages volumes externally — VOLUME instruction banned per Railway docs
+# Volume mounted at /data via Railway dashboard/API
 ENV OPENFANG_HOME=/data
 ENTRYPOINT ["openfang"]
 CMD ["start"]
