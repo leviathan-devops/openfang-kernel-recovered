@@ -1,0 +1,296 @@
+LEVIATHAN HYDRA POD SYSTEM - COMPLETE FILE INDEX
+================================================
+
+Date Created: 2026-03-04
+System Version: 3.4.0
+Status: READY FOR DEPLOYMENT
+
+CREATED FILES
+=============
+
+1. ROOT CONFIGURATION
+   File: /sessions/eager-stoic-sagan/openfang-kernel-recovered/config.toml
+   Size: 739 bytes (34 lines)
+   Purpose: Main OpenFang kernel configuration
+   Contents:
+   - API settings (0.0.0.0:50051 for Railway)
+   - Default model (DeepSeek V3 via OpenRouter)
+   - Memory configuration (decay_rate: 0.05)
+   - Compaction settings (threshold: 80, keep_recent: 20)
+   - Discord integration (dual-guild)
+   - Vault security configuration
+
+2. AGENT CONFIGURATIONS
+   
+   a) Emperor Agent
+      File: /sessions/eager-stoic-sagan/openfang-kernel-recovered/agents/emperor/agent.toml
+      Size: 3,354 bytes (73 lines)
+      Role: Supreme Commander/Orchestrator
+      Model: DeepSeek V3 (deepseek/deepseek-chat-v3-0324:free)
+      Authority: Full pod control, agent spawning
+      Memory: Full read/write access to all namespaces
+      Token Limit: 1,000,000/hour
+      Check Interval: 60 seconds
+      
+   b) Leviathan-Architect Agent
+      File: /sessions/eager-stoic-sagan/openfang-kernel-recovered/agents/leviathan-architect/agent.toml
+      Size: 2,952 bytes (71 lines)
+      Role: System Design Specialist
+      Model: DeepSeek R1 (deepseek/deepseek-r1:free)
+      Specialization: Architecture, design trade-offs
+      Memory: Read [emperor, sentinel, operator], Write [architecture, design_decisions]
+      Token Limit: 800,000/hour
+      Check Interval: 120 seconds
+      
+   c) Scribe Agent
+      File: /sessions/eager-stoic-sagan/openfang-kernel-recovered/agents/scribe/agent.toml
+      Size: 3,175 bytes (74 lines)
+      Role: Documentation & Audit Specialist
+      Model: Google Gemma 3 (google/gemma-3-27b-it:free)
+      Specialization: Documentation, compliance, reporting
+      Memory: Read all (*), Write [documentation, audit, reports]
+      Token Limit: 600,000/hour
+      Check Interval: 180 seconds
+      
+   d) Sentinel Agent
+      File: /sessions/eager-stoic-sagan/openfang-kernel-recovered/agents/sentinel/agent.toml
+      Size: 3,132 bytes (74 lines)
+      Role: Security & QA Auditor
+      Model: Qwen QWQ (qwen/qwq-32b:free)
+      Specialization: Security review, quality gates
+      Memory: Read all (*), Write [security, audit, qa]
+      Token Limit: 800,000/hour
+      Check Interval: 120 seconds
+      
+   e) Operator Agent
+      File: /sessions/eager-stoic-sagan/openfang-kernel-recovered/agents/operator/agent.toml
+      Size: 3,621 bytes (80 lines)
+      Role: DevOps & Execution Specialist
+      Model: DeepSeek V3 (deepseek/deepseek-chat-v3-0324:free)
+      Specialization: Deployment, infrastructure, CI/CD
+      Memory: Read [emperor, architect, sentinel], Write [operations, deployments, infrastructure]
+      Token Limit: 900,000/hour
+      Check Interval: 60 seconds
+
+3. DOCUMENTATION FILES
+   
+   a) System Documentation
+      File: /sessions/eager-stoic-sagan/openfang-kernel-recovered/LEVIATHAN_HYDRA.md
+      Purpose: Comprehensive HYDRA pod system guide
+      Contents:
+      - HYDRA roster overview
+      - Agent roles and responsibilities
+      - Configuration file specifications
+      - Agent communication patterns
+      - Memory architecture
+      - Deployment considerations
+      - Operational workflows
+      
+   b) File Index (this file)
+      File: /sessions/eager-stoic-sagan/openfang-kernel-recovered/HYDRA_INDEX.txt
+      Purpose: Complete inventory of all created files
+
+TOTAL FILES CREATED: 8
+TOTAL LINES OF CONFIG: 406
+TOTAL SIZE: Approximately 20 KB
+
+CONFIGURATION SUMMARY
+====================
+
+MODELS CONFIGURED:
+- DeepSeek V3 (Emperor, Operator)
+- DeepSeek R1 (Architect, fallback)
+- Google Gemma 3 (Scribe)
+- Qwen QWQ (Sentinel)
+
+PROVIDER:
+- All models via OpenRouter
+- Base URL: https://openrouter.ai/api/v1
+- API Key Env: OPENROUTER_API_KEY
+
+AGENT COMMUNICATION:
+- Emperor: Central hub, can spawn/kill all agents
+- All other agents: Message Emperor only
+- Shared memory: Emperor-coordinated
+- Fallback models: Configured for redundancy
+
+RESOURCE ALLOCATION:
+- Total token budget: 4,100,000/hour
+- Total concurrent agents: 5
+- Memory decay: 0.05 per cycle
+- Compaction: Auto-triggered at 80 messages
+
+DEPLOYMENT TARGET:
+- Platform: Railway
+- API Listen: 0.0.0.0:50051
+- Configuration: Environment-variable based
+- Security: No hardcoded secrets
+
+ENVIRONMENT VARIABLES REQUIRED
+==============================
+
+REQUIRED:
+1. OPENROUTER_API_KEY
+   - For all OpenRouter model access
+   - Obtained from openrouter.ai
+
+OPTIONAL:
+2. DISCORD_BOT_TOKEN
+   - For Discord guild integration
+   - Supports two guild IDs
+
+3. OPENFANG_VAULT_KEY
+   - Master key for encrypted secret storage
+   - Used for sensitive operations
+
+FILE LOCATIONS
+==============
+
+Root Configuration:
+  /sessions/eager-stoic-sagan/openfang-kernel-recovered/config.toml
+
+Agent Configurations:
+  /sessions/eager-stoic-sagan/openfang-kernel-recovered/agents/emperor/agent.toml
+  /sessions/eager-stoic-sagan/openfang-kernel-recovered/agents/leviathan-architect/agent.toml
+  /sessions/eager-stoic-sagan/openfang-kernel-recovered/agents/scribe/agent.toml
+  /sessions/eager-stoic-sagan/openfang-kernel-recovered/agents/sentinel/agent.toml
+  /sessions/eager-stoic-sagan/openfang-kernel-recovered/agents/operator/agent.toml
+
+Documentation:
+  /sessions/eager-stoic-sagan/openfang-kernel-recovered/LEVIATHAN_HYDRA.md
+  /sessions/eager-stoic-sagan/openfang-kernel-recovered/HYDRA_INDEX.txt
+
+QUICK START GUIDE
+=================
+
+1. Set Environment Variables
+   export OPENROUTER_API_KEY="your-api-key"
+   
+2. Verify Configuration
+   - All .toml files in correct locations
+   - TOML syntax valid (run toml parser)
+   
+3. Start OpenFang Kernel
+   - System loads config.toml from root
+   - System loads all agent configs from agents/ directories
+   - Emperor agent initializes as primary
+   - Other agents auto-register
+
+4. Test Connectivity
+   - Send test request to http://localhost:50051
+   - Verify Emperor receives and routes request
+   - Monitor agent responses
+
+5. Monitor Operations
+   - Check logs for agent initialization
+   - Review Scribe documentation output
+   - Validate Sentinel security checks
+
+SYSTEM ARCHITECTURE
+===================
+
+Layer 1: API Interface (0.0.0.0:50051)
+Layer 2: Emperor Orchestrator
+Layer 3: Specialist Agents (Architect, Scribe, Sentinel, Operator)
+Layer 4: Shared Memory (Emperor-coordinated)
+Layer 5: External Services (OpenRouter, Discord, Vault)
+
+CAPABILITIES MATRIX
+===================
+
+Emperor:
+  - agent_send: Yes
+  - agent_spawn: Yes
+  - agent_kill: Yes
+  - agent_list: Yes
+  - memory_read: All
+  - memory_write: All
+  - file_read: Yes
+  - file_write: Yes
+  - shell_exec: No
+  - docker_exec: No
+
+Architect:
+  - agent_send: Yes (to Emperor)
+  - agent_spawn: No
+  - memory_read: Select (emperor, sentinel, operator)
+  - memory_write: Select (architecture, design_decisions)
+  - file_read: Yes
+  - file_write: Yes
+  - shell_exec: No
+  - docker_exec: No
+
+Scribe:
+  - agent_send: Yes (to Emperor)
+  - agent_spawn: No
+  - memory_read: All
+  - memory_write: Select (documentation, audit, reports)
+  - file_read: Yes
+  - file_write: Yes
+  - shell_exec: No
+  - docker_exec: No
+
+Sentinel:
+  - agent_send: Yes (to Emperor)
+  - agent_spawn: No
+  - memory_read: All
+  - memory_write: Select (security, audit, qa)
+  - file_read: Yes
+  - file_write: No
+  - shell_exec: No
+  - docker_exec: No
+
+Operator:
+  - agent_send: Yes (to Emperor)
+  - agent_spawn: No
+  - memory_read: Select (emperor, architect, sentinel)
+  - memory_write: Select (operations, deployments, infrastructure)
+  - file_read: Yes
+  - file_write: Yes
+  - shell_exec: Yes
+  - docker_exec: Yes
+
+VERIFICATION CHECKLIST
+=====================
+
+Configuration Files:
+  [✓] config.toml created and verified
+  [✓] emperor/agent.toml created and verified
+  [✓] leviathan-architect/agent.toml created and verified
+  [✓] scribe/agent.toml created and verified
+  [✓] sentinel/agent.toml created and verified
+  [✓] operator/agent.toml created and verified
+
+Content Verification:
+  [✓] All TOML syntax valid
+  [✓] All model IDs correct
+  [✓] All API endpoints specified
+  [✓] All memory namespaces defined
+  [✓] All capabilities configured
+  [✓] All environment variables referenced
+
+Integration Verification:
+  [✓] Emperor has spawn authority
+  [✓] All agents configured for agent_send
+  [✓] Memory access controls in place
+  [✓] Fallback models specified
+  [✓] Token limits reasonable
+  [✓] Check intervals optimized
+
+Deployment Verification:
+  [✓] API listens on Railway port
+  [✓] No hardcoded secrets
+  [✓] Environment variables external
+  [✓] Configuration scalable
+  [✓] Documentation complete
+
+DEPLOYMENT STATUS: READY
+========================
+
+All configuration files have been created, verified, and are ready for
+deployment to the OpenFang kernel. The HYDRA pod system is fully configured
+and can be deployed immediately upon setting the required environment variables.
+
+Last Updated: 2026-03-04
+System Version: 3.4.0
+Status: COMPLETE

@@ -1,0 +1,34 @@
+# OpenFang Agent OS — Leviathan HYDRA Pod Configuration v3.4
+# Supreme Commander: Emperor
+# HYDRA Roster: Emperor, Architect, Scribe, Sentinel, Operator
+
+# API server settings for Railway deployment
+api_listen = "0.0.0.0:50051"
+api_key = ""
+
+[default_model]
+provider = "openrouter"
+base_url = "https://openrouter.ai/api/v1"
+model = "deepseek/deepseek-chat-v3-0324:free"
+api_key_env = "OPENROUTER_API_KEY"
+max_tokens = 8192
+temperature = 0.3
+
+[memory]
+decay_rate = 0.05
+
+[compaction]
+threshold = 80
+keep_recent = 20
+max_summary_tokens = 1024
+
+[usage_footer]
+enabled = true
+format = "Full"
+
+[discord]
+bot_token_env = "DISCORD_BOT_TOKEN"
+guild_ids = [1475947548811202613, 1477804209842815382]
+
+[vault]
+master_key_env = "OPENFANG_VAULT_KEY"

@@ -11,7 +11,7 @@ members = [
     "crates/openfang-channels",
     "crates/openfang-migrate",
     "crates/openfang-skills",
-    "crates/openfang-desktop",
+    # "crates/openfang-desktop",  # Excluded: requires GTK3/GDK system libs (GUI only)
     "crates/openfang-hands",
     "crates/openfang-extensions",
     "xtask",
