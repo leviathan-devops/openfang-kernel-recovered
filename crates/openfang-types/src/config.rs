@@ -1253,6 +1253,7 @@ impl Default for KernelConfig {
             budget: BudgetConfig::default(),
             provider_urls: HashMap::new(),
             oauth: OAuthConfig::default(),
+            compaction: CompactionTomlConfig::default(),
         }
     }
 }

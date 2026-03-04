@@ -15,6 +15,7 @@ pub mod error;
 pub mod event_bus;
 pub mod heartbeat;
 pub mod kernel;
+pub mod leviathan;
 pub mod metering;
 pub mod pairing;
 pub mod registry;
@@ -27,3 +28,4 @@ pub mod workflow;
 
 pub use kernel::DeliveryTracker;
 pub use kernel::OpenFangKernel;
+pub use leviathan::{HydraPod, HydraPodManager, LeviathanOS, PodResult, PodStatus};
