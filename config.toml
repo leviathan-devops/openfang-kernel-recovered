@@ -1,6 +1,6 @@
 # OpenFang Agent OS — Leviathan HYDRA Pod Configuration v3.4
-# Supreme Commander: Emperor
-# HYDRA Roster: Emperor, Architect, Scribe, Sentinel, Operator
+# Supreme Commander: Emperor / Shark Commander
+# HYDRA Roster: Emperor, Architect, Scribe, Sentinel, Operator, Shark Commander
 
 # API server settings for Railway deployment
 api_listen = "0.0.0.0:50051"
@@ -32,3 +32,9 @@ guild_ids = [1475947548811202613, 1477804209842815382]
 
 [vault]
 master_key_env = "OPENFANG_VAULT_KEY"
+
+# Shark Commander Brain — DeepSeek R1 overseer agent
+[agent.shark-commander]
+manifest = "agents/shark-commander/agent.toml"
+system_prompt = "prompts/shark-commander.md"
+autostart = true

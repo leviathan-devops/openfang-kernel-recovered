@@ -1,0 +1,43 @@
+name = "shark-commander"
+version = "1.0.0"
+description = "Shark Commander Brain — Permanent DeepSeek R1 overseer agent. Digital embodiment of the user with absolute authority over code architects and HYDRA pod enforcement."
+author = "leviathan"
+module = "builtin:chat"
+
+[model]
+provider = "deepseek"
+base_url = "https://api.deepseek.com/v1"
+model = "deepseek-reasoner"
+api_key_env = "DEEPSEEK_API_KEY"
+max_tokens = 8192
+temperature = 0.1
+system_prompt_file = "/app/prompts/shark-commander.md"
+
+[[fallback_models]]
+provider = "openrouter"
+base_url = "https://openrouter.ai/api/v1"
+model = "deepseek/deepseek-r1:free"
+api_key_env = "OPENROUTER_API_KEY"
+
+[schedule]
+continuous = { check_interval_secs = 30 }
+
+[resources]
+max_llm_tokens_per_hour = 2000000
+
+[capabilities]
+tools = ["agent_send", "agent_spawn", "agent_list", "agent_kill", "memory_store", "memory_recall", "file_read", "file_write", "shell_exec", "http_request"]
+memory_read = ["*"]
+memory_write = ["*"]
+agent_spawn = true
+agent_message = ["*"]
+
+[memory]
+enabled = true
+semantic_search = true
+vector_dim = 384
+knowledge_graph = true
+
+[discord]
+enabled = true
+token_env = "DISCORD_TOKEN"
