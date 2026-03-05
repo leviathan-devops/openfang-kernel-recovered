@@ -176,13 +176,24 @@ pgrep -f openfang && pkill -f openfang
 - **`OpenFangError` / `OpenFangResult<T>`** — standard error types
 
 ## CRITICAL: LLM Provider Policy
-- **This project runs EXCLUSIVELY on DeepSeek R1 via the DeepSeek API directly.**
-- Default provider: `deepseek`, model: `deepseek-reasoner`, key env: `DEEPSEEK_API_KEY`, base URL: `https://api.deepseek.com/v1`
-- **DO NOT** use OpenRouter, Anthropic/Claude, OpenAI/GPT, or any other provider or proxy.
-- **DO NOT** set `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `OPENROUTER_API_KEY`, or any non-DeepSeek key.
+
+### Shark Commander (Primary "Brain" Agent)
+- **HARDCODED to DeepSeek R1 via the DeepSeek API directly. No exceptions.**
+- Provider: `deepseek`, model: `deepseek-reasoner`, key env: `DEEPSEEK_API_KEY`, base URL: `https://api.deepseek.com/v1`
+- **DO NOT** route Shark Commander through OpenRouter, Anthropic, OpenAI, or any proxy/gateway.
+- **DO NOT** change Shark Commander's provider, model, or API key config for any reason.
+- The `[default_model]` section in `config.toml` IS the Shark Commander brain config. Do not touch it.
+
+### Sub-Agents (Deployed by Shark Commander)
+- Sub-agents MAY use other models via OpenRouter or other providers — Shark Commander decides this at runtime.
+- `OPENROUTER_API_KEY` exists for sub-agent deployment ONLY. It is NOT for the primary agent.
+- Do not confuse sub-agent provider config with the primary brain config. They are separate.
+
+### Rules for Both
 - If config deserialization fails, **fix the config** — do not rely on compiled-in defaults.
 - If a driver fails to initialize, **fix the driver code** — do not hack env vars to make it work.
-- Any PR that introduces a non-DeepSeek provider dependency will be rejected.
+- **DO NOT** set `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` as workarounds for anything.
+- Any PR that changes Shark Commander's provider away from DeepSeek will be rejected.
 
 ## Common Gotchas
 - Binary may be locked if daemon is running — use `--lib` flag or kill daemon first
