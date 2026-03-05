@@ -1,4 +1,5 @@
 [build]
+builder = "nixpacks"
 dockerfilePath = "Dockerfile.leviathan"
 
 [deploy]
