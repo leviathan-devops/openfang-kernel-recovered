@@ -1,37 +1,31 @@
-# OpenFang Agent OS — Leviathan HYDRA Pod Configuration v3.4
-# Supreme Commander: Emperor / Shark Commander
-# HYDRA Roster: Emperor, Architect, Scribe, Sentinel, Operator, Shark Commander
+# OpenFang Agent OS — Shark Commander Brain Configuration
+# Deployed on Railway for Phase 1
 
-# API server settings for Railway deployment
-api_listen = "0.0.0.0:50051"
+# API server binding — Railway overrides via PORT env var
+# but leviathan-server reads PORT directly, so this is the fallback
+api_listen = "0.0.0.0:8080"
 api_key = ""
 
+# Default model: DeepSeek R1 (Shark Commander brain)
 [default_model]
 provider = "deepseek"
 model = "deepseek-reasoner"
 api_key_env = "DEEPSEEK_API_KEY"
-max_tokens = 8192
-temperature = 0.3
 
+# Memory substrate
 [memory]
 decay_rate = 0.05
 
+# Session compaction
 [compaction]
 threshold = 80
 keep_recent = 20
 max_summary_tokens = 1024
 
-usage_footer = "full"
+# Usage footer
+usage_footer = "Full"
 
-[discord]
-bot_token_env = "DISCORD_BOT_TOKEN"
-guild_ids = [1475947548811202613, 1477804209842815382]
-
-[vault]
-master_key_env = "OPENFANG_VAULT_KEY"
-
-# Shark Commander Brain — DeepSeek R1 overseer agent
-[agent.shark-commander]
-manifest = "agents/shark-commander/agent.toml"
-system_prompt = "prompts/shark-commander.md"
-autostart = true
+# Discord channel bridge — correct nested path under [channels]
+[channels.discord]
+bot_token_env = "DISCORD_TOKEN"
+default_agent = "shark-commander"

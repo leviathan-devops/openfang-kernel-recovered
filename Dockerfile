@@ -1,0 +1,71 @@
+# ============================================================
+# Shark Commander Brain — OpenFang Agent OS
+# Multi-stage Docker build for Railway deployment
+# ============================================================
+
+# Stage 1: Build the Rust binary
+FROM rust:1.83-bookworm AS builder
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy workspace files
+COPY Cargo.toml Cargo.lock rust-toolchain.toml ./
+COPY crates/ crates/
+COPY xtask/ xtask/
+COPY agents/ agents/
+COPY packages/ packages/
+COPY prompts/ prompts/
+
+# Build the leviathan-server binary in release mode
+RUN cargo build --release --bin leviathan-server \
+    --no-default-features \
+    2>&1 | tail -20
+
+# Stage 2: Minimal runtime image
+FROM debian:bookworm-slim AS runtime
+
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    libssl3 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy the compiled binary
+COPY --from=builder /app/target/release/leviathan-server /app/leviathan-server
+
+# Copy agent definitions and prompts
+COPY agents/ /app/agents/
+COPY prompts/ /app/prompts/
+
+# Copy config
+COPY config.toml /app/config.toml
+
+# Copy entrypoint script
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+# Create data directory
+RUN mkdir -p /app/data
+
+# Environment variables
+ENV RUST_LOG=info
+ENV OPENFANG_CONFIG=/app/config.toml
+ENV OPENFANG_DATA_DIR=/app/data
+
+# Railway assigns PORT dynamically — server reads $PORT env var
+# Default to 8080 if not set (local development)
+ENV PORT=8080
+
+# Expose default port (Railway overrides dynamically)
+EXPOSE 8080
+
+# Run the entrypoint script (starts server + spawns agent)
+CMD ["/app/entrypoint.sh"]
