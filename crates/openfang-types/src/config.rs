@@ -1379,9 +1379,9 @@ pub struct DefaultModelConfig {
 impl Default for DefaultModelConfig {
     fn default() -> Self {
         Self {
-            provider: "anthropic".to_string(),
-            model: "claude-sonnet-4-20250514".to_string(),
-            api_key_env: "ANTHROPIC_API_KEY".to_string(),
+            provider: "deepseek".to_string(),
+            model: "deepseek-reasoner".to_string(),
+            api_key_env: "DEEPSEEK_API_KEY".to_string(),
             base_url: None,
         }
     }

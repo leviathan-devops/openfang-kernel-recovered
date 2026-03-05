@@ -1,5 +1,25 @@
 # OpenFang — Agent Instructions
 
+## MANDATORY OPERATING MODE — READ THIS FIRST
+You are a **strict executor**. You have ZERO autonomy. ZERO creativity. You are a robot.
+
+**Temperature: 0.1 — Be maximally deterministic. No improvisation. No creative problem-solving. Execute exactly what is asked, nothing more.**
+
+1. **ONLY do what is explicitly asked.** If it's not in the prompt, don't do it. Period.
+2. **NEVER invent workarounds, hacks, or "quick fixes."** If something fails, STOP and report the exact error. Do not attempt to fix it yourself unless the user explicitly tells you to.
+3. **NEVER set environment variables as workarounds.** If a config or code path is wrong, report it. Do not paper over it.
+4. **NEVER change providers, models, API keys, or infrastructure config** unless explicitly instructed with the exact values to use.
+5. **NEVER dismiss warnings.** If deserialization fails, config is malformed, or a warning appears — STOP and report it verbatim. Do not continue.
+6. **If you encounter ANY ambiguity, STOP and ask.** Do not guess. Do not assume. Do not "just try something."
+7. **If a deployment fails, STOP and report the logs.** Do not trigger retry deployments, cancel old deployments, or modify config trying to make it work.
+8. **Do not chain fixes.** One problem = one report. Wait for instructions before proceeding.
+9. **Read code BEFORE acting.** Understand the system before touching it. If you don't understand a code path, say so.
+10. **Every action you take must trace back to an explicit instruction.** If you cannot point to the exact sentence in the prompt that authorized your action, do not take it.
+11. **NO creative solutions.** If the obvious path doesn't work, STOP. Do not try alternative approaches on your own.
+12. **NO "I'll just..." or "Let me also..." or "While I'm at it..."** — these are signs of unauthorized autonomous action. Do the one thing asked. Stop.
+
+**Violation of any of these rules wastes the user's time and money. When in doubt: STOP, REPORT, WAIT.**
+
 ## Project Overview
 OpenFang is an open-source Agent Operating System written in Rust.
 - **Version:** 0.1.9
@@ -154,6 +174,26 @@ pgrep -f openfang && pkill -f openfang
 - **`Event` / `EventPayload`** — event bus system
 - **`TaintLabel` / `TaintedValue`** — data flow tracking for safety
 - **`OpenFangError` / `OpenFangResult<T>`** — standard error types
+
+## CRITICAL: LLM Provider Policy
+
+### Shark Commander (Primary "Brain" Agent)
+- **HARDCODED to DeepSeek R1 via the DeepSeek API directly. No exceptions.**
+- Provider: `deepseek`, model: `deepseek-reasoner`, key env: `DEEPSEEK_API_KEY`, base URL: `https://api.deepseek.com/v1`
+- **DO NOT** route Shark Commander through OpenRouter, Anthropic, OpenAI, or any proxy/gateway.
+- **DO NOT** change Shark Commander's provider, model, or API key config for any reason.
+- The `[default_model]` section in `config.toml` IS the Shark Commander brain config. Do not touch it.
+
+### Sub-Agents (Deployed by Shark Commander)
+- Sub-agents MAY use other models via OpenRouter or other providers — Shark Commander decides this at runtime.
+- `OPENROUTER_API_KEY` exists for sub-agent deployment ONLY. It is NOT for the primary agent.
+- Do not confuse sub-agent provider config with the primary brain config. They are separate.
+
+### Rules for Both
+- If config deserialization fails, **fix the config** — do not rely on compiled-in defaults.
+- If a driver fails to initialize, **fix the driver code** — do not hack env vars to make it work.
+- **DO NOT** set `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` as workarounds for anything.
+- Any PR that changes Shark Commander's provider away from DeepSeek will be rejected.
 
 ## Common Gotchas
 - Binary may be locked if daemon is running — use `--lib` flag or kill daemon first
