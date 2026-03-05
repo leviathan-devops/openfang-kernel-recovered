@@ -8,15 +8,19 @@ use openfang_kernel::leviathan::LeviathanOS;
 use std::path::PathBuf;
 
 fn main() {
-    // Initialize tracing for structured logging
+    // Use plain text logging so Railway can capture messages
+    // (Railway's log parser doesn't handle JSON tracing output properly)
     tracing_subscriber::fmt()
         .with_env_filter(
             tracing_subscriber::EnvFilter::try_from_default_env()
                 .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("info")),
         )
-        .json()
+        .with_target(false)
         .init();
 
+    // Also print to stderr directly as safety net
+    eprintln!("=== Leviathan v3.4.4 — OpenFang Agent OS ===");
+    eprintln!("Starting server...");
     tracing::info!("=== Leviathan v3.4.4 — OpenFang Agent OS ===");
     tracing::info!("Starting server...");
 
@@ -37,12 +41,15 @@ fn main() {
     tracing::info!("Config path: {:?}", config_path);
 
     // Boot Leviathan OS (which boots the OpenFang kernel internally)
+    eprintln!("Booting Leviathan OS from config: {:?}", config_path);
     let leviathan = match LeviathanOS::boot(config_path.as_deref()) {
         Ok(l) => {
+            eprintln!("Leviathan OS v{} booted successfully", l.version());
             tracing::info!("Leviathan OS v{} booted successfully", l.version());
             l
         }
         Err(e) => {
+            eprintln!("FATAL: Failed to boot Leviathan: {}", e);
             tracing::error!("FATAL: Failed to boot Leviathan: {}", e);
             std::process::exit(1);
         }
