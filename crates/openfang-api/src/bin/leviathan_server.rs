@@ -50,7 +50,12 @@ fn main() {
     };
 
     let kernel = leviathan.kernel();
-    let listen_addr = kernel.config.api_listen.clone();
+    // Railway assigns PORT dynamically — override config if PORT env var is set
+    let listen_addr = if let Ok(port) = std::env::var("PORT") {
+        format!("0.0.0.0:{}", port)
+    } else {
+        kernel.config.api_listen.clone()
+    };
 
     tracing::info!("API server binding to {}", listen_addr);
     tracing::info!(
