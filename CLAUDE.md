@@ -1,16 +1,38 @@
 # OpenFang — Agent Instructions
 
 ## Project Overview
-OpenFang is an open-source Agent Operating System written in Rust (14 crates).
-- Config: `~/.openfang/config.toml`
-- Default API: `http://127.0.0.1:4200`
-- CLI binary: `target/release/openfang.exe` (or `target/debug/openfang.exe`)
+OpenFang is an open-source Agent Operating System written in Rust.
+- **Version:** 0.1.9
+- **Rust edition:** 2021 (minimum rustc 1.75)
+- **License:** Apache-2.0 OR MIT
+- **Workspace:** 14 crates + 1 xtask (see Crate Map below)
+- **Config:** `~/.openfang/config.toml`
+- **Default API:** `http://127.0.0.1:4200`
+- **CLI binary:** `target/release/openfang` (or `target/debug/openfang`)
+
+## Crate Map
+| Crate | Purpose |
+|-------|---------|
+| `openfang-types` | Core shared data structures (agents, tools, memory, events, approvals, config) |
+| `openfang-kernel` | OS kernel — agent lifecycles, permissions, scheduling, memory, metering, workflows |
+| `openfang-runtime` | Agent execution loop, LLM drivers, tool execution, WASM/Docker sandboxing, plugins |
+| `openfang-api` | HTTP/WebSocket server (Axum), REST endpoints, OpenAI-compat routes |
+| `openfang-memory` | Unified memory abstraction — SQLite (structured), LIKE-matching (semantic), knowledge graphs |
+| `openfang-channels` | 25+ messaging platform bridges (Discord, Slack, Telegram, Email, WhatsApp, Matrix, IRC, etc.) |
+| `openfang-cli` | Interactive CLI and daemon launcher (TUI dashboard, agent management) |
+| `openfang-wire` | OFP agent-to-agent networking (peer discovery, JSON-RPC framing) |
+| `openfang-skills` | Plugin system — Python/WASM/Node/Builtin/PromptOnly skills, ClawHub marketplace |
+| `openfang-hands` | Autonomous capability packages (pre-built domain-complete agent configs) |
+| `openfang-extensions` | MCP integration (25 templates: GitHub, Slack, Google, OAuth2-PKCE, credential vault) |
+| `openfang-migrate` | Framework migration engine (OpenClaw → OpenFang) |
+| `openfang-desktop` | GTK3 GUI (excluded from workspace — requires system GTK3/GDK libs) |
+| `xtask` | Build automation tasks |
 
 ## Build & Verify Workflow
 After every feature implementation, run ALL THREE checks:
 ```bash
-cargo build --workspace --lib          # Must compile (use --lib if exe is locked)
-cargo test --workspace                 # All tests must pass (currently 1744+)
+cargo build --workspace --lib          # Must compile (use --lib if binary is locked)
+cargo test --workspace                 # All tests must pass (currently 1802+)
 cargo clippy --workspace --all-targets -- -D warnings  # Zero warnings
 ```
 
@@ -25,10 +47,12 @@ cargo clippy --workspace --all-targets -- -D warnings  # Zero warnings
 
 #### Step 1: Stop any running daemon
 ```bash
-tasklist | grep -i openfang
-taskkill //PID <pid> //F
-# Wait 2-3 seconds for port to release
-sleep 3
+# Linux
+pgrep -f openfang && pkill -f openfang
+# Windows (MSYS2/Git Bash)
+# tasklist | grep -i openfang
+# taskkill //PID <pid> //F
+sleep 3  # Wait for port to release
 ```
 
 #### Step 2: Build fresh release binary
@@ -38,7 +62,7 @@ cargo build --release -p openfang-cli
 
 #### Step 3: Start daemon with required API keys
 ```bash
-GROQ_API_KEY=<key> target/release/openfang.exe start &
+GROQ_API_KEY=<key> target/release/openfang start &
 sleep 6  # Wait for full boot
 curl -s http://127.0.0.1:4200/api/health  # Verify it's up
 ```
@@ -86,8 +110,11 @@ curl -s http://127.0.0.1:4200/ | grep -c "newComponentName"
 
 #### Step 8: Cleanup
 ```bash
-tasklist | grep -i openfang
-taskkill //PID <pid> //F
+# Linux
+pgrep -f openfang && pkill -f openfang
+# Windows (MSYS2/Git Bash)
+# tasklist | grep -i openfang
+# taskkill //PID <pid> //F
 ```
 
 ### Key API Endpoints for Testing
@@ -113,9 +140,23 @@ taskkill //PID <pid> //F
 - New routes must be registered in `server.rs` router AND implemented in `routes.rs`
 - Dashboard is Alpine.js SPA in `static/index_body.html` — new tabs need both HTML and JS data/methods
 - Config fields need: struct field + `#[serde(default)]` + Default impl entry + Serialize/Deserialize derives
+- Memory model: unified trait abstracts over 3 backends (structured / semantic / knowledge graph)
+- Sandboxing: WASM (wasmtime), Docker, subprocess isolation, Python runtime
+- OFP wire protocol for agent-to-agent communication across machines
+
+## Key Types & Traits
+- **`OpenFangKernel`** — main kernel struct managing all agents/memory/scheduling
+- **`AgentManifest`** — agent definition, capabilities, permissions
+- **`AgentState`** — enum: Active, Paused, Suspended, Terminated
+- **`Memory` trait** — unified memory interface (MemoryFragment, MemoryFilter)
+- **`KernelHandle` trait** — decouples runtime from kernel (no circular deps)
+- **`HydraPodManager` / `HydraPod` / `LeviathanOS`** — pod-based execution
+- **`Event` / `EventPayload`** — event bus system
+- **`TaintLabel` / `TaintedValue`** — data flow tracking for safety
+- **`OpenFangError` / `OpenFangResult<T>`** — standard error types
 
 ## Common Gotchas
-- `openfang.exe` may be locked if daemon is running — use `--lib` flag or kill daemon first
+- Binary may be locked if daemon is running — use `--lib` flag or kill daemon first
 - `PeerRegistry` is `Option<PeerRegistry>` on kernel but `Option<Arc<PeerRegistry>>` on `AppState` — wrap with `.as_ref().map(|r| Arc::new(r.clone()))`
 - Config fields added to `KernelConfig` struct MUST also be added to the `Default` impl or build fails
 - `AgentLoopResult` field is `.response` not `.response_text`
