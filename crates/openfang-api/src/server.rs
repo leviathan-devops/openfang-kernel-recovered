@@ -644,7 +644,13 @@ pub async fn run_daemon(
     listen_addr: &str,
     daemon_info_path: Option<&Path>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let addr: SocketAddr = listen_addr.parse()?;
+    // Railway/Render/Fly.io assign PORT dynamically — always respect it
+    let effective_addr = if let Ok(port) = std::env::var("PORT") {
+        format!("0.0.0.0:{port}")
+    } else {
+        listen_addr.to_string()
+    };
+    let addr: SocketAddr = effective_addr.parse()?;
     kernel.set_self_handle();
     kernel.start_background_agents();
 
