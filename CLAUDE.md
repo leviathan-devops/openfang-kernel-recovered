@@ -176,10 +176,10 @@ pgrep -f openfang && pkill -f openfang
 - **`OpenFangError` / `OpenFangResult<T>`** — standard error types
 
 ## CRITICAL: LLM Provider Policy
-- **This project runs EXCLUSIVELY on DeepSeek R1 via OpenRouter.**
-- Default provider: `openrouter`, model: `deepseek/deepseek-chat-v3-0324:free`, key env: `OPENROUTER_API_KEY`
-- **DO NOT** add, reference, or fall back to Anthropic/Claude, OpenAI/GPT, or any other provider.
-- **DO NOT** set `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, or any non-OpenRouter key as a workaround.
+- **This project runs EXCLUSIVELY on DeepSeek R1 via the DeepSeek API directly.**
+- Default provider: `deepseek`, model: `deepseek-reasoner`, key env: `DEEPSEEK_API_KEY`, base URL: `https://api.deepseek.com/v1`
+- **DO NOT** use OpenRouter, Anthropic/Claude, OpenAI/GPT, or any other provider or proxy.
+- **DO NOT** set `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `OPENROUTER_API_KEY`, or any non-DeepSeek key.
 - If config deserialization fails, **fix the config** — do not rely on compiled-in defaults.
 - If a driver fails to initialize, **fix the driver code** — do not hack env vars to make it work.
 - Any PR that introduces a non-DeepSeek provider dependency will be rejected.

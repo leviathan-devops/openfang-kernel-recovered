@@ -7,10 +7,9 @@ api_listen = "0.0.0.0:50051"
 api_key = ""
 
 [default_model]
-provider = "openrouter"
-base_url = "https://openrouter.ai/api/v1"
-model = "deepseek/deepseek-chat-v3-0324:free"
-api_key_env = "OPENROUTER_API_KEY"
+provider = "deepseek"
+model = "deepseek-reasoner"
+api_key_env = "DEEPSEEK_API_KEY"
 max_tokens = 8192
 temperature = 0.3
 
