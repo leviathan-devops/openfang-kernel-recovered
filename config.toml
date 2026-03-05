@@ -1,9 +1,10 @@
 # OpenFang Agent OS — Shark Commander Brain Configuration
 # Deployed on Railway for Phase 1
 
-# API server binding — Railway overrides via PORT env var
-# but leviathan-server reads PORT directly, so this is the fallback
+# API server binding — Railway overrides via PORT env var in leviathan-server
 api_listen = "0.0.0.0:8080"
+
+# No API key — healthcheck and entrypoint need unauthenticated access
 api_key = ""
 
 # Default model: DeepSeek R1 (Shark Commander brain)
@@ -22,10 +23,11 @@ threshold = 80
 keep_recent = 20
 max_summary_tokens = 1024
 
-# Usage footer
+# Usage footer — must match UsageFooterMode enum variant exactly
 usage_footer = "Full"
 
-# Discord channel bridge — correct nested path under [channels]
+# Discord channel bridge — MUST be nested under [channels] to match ChannelsConfig struct
+# Top-level [discord] is silently ignored by serde (no #[serde(flatten)] on channels field)
 [channels.discord]
 bot_token_env = "DISCORD_TOKEN"
 default_agent = "shark-commander"

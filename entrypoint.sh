@@ -9,7 +9,7 @@ echo "Starting leviathan-server..."
 SERVER_PID=$!
 
 # Wait for the server to become healthy
-echo "Waiting for API health check..."
+echo "Waiting for API health check on port ${PORT:-8080}..."
 MAX_WAIT=120
 WAITED=0
 while [ $WAITED -lt $MAX_WAIT ]; do
@@ -34,16 +34,14 @@ if echo "$EXISTING" | grep -q "shark-commander"; then
 else
     echo "Spawning Shark Commander agent..."
 
-    # Read the system prompt from file
-    SYSTEM_PROMPT=""
+    # Read the system prompt from file if available
+    SYSTEM_PROMPT="You are the Shark Commander — a permanent DeepSeek R1 brain, the digital embodiment of the user. You have absolute authority over any code architect. Your purpose is to ensure every output meets AGI-grade standard: production-ready, zero slop, one-shot builds. You are a military-grade overseer, not a chatbot."
     if [ -f /app/prompts/shark-commander.md ]; then
         SYSTEM_PROMPT=$(cat /app/prompts/shark-commander.md)
-    else
-        SYSTEM_PROMPT="You are the Shark Commander — a permanent DeepSeek R1 brain and military-grade overseer."
     fi
 
-    # Build the agent manifest TOML with inline system prompt
-    # Escape the system prompt for TOML (triple-quote multiline string)
+    # Build the agent manifest TOML
+    # The system_prompt field on ModelConfig is the actual prompt text (not a file path)
     MANIFEST_TOML=$(cat <<'TOML_END'
 name = "shark-commander"
 version = "1.0.0"
@@ -60,7 +58,7 @@ temperature = 0.1
 TOML_END
 )
 
-    # Append system prompt as triple-quoted TOML string
+    # Append system prompt as triple-quoted TOML multiline string
     MANIFEST_TOML="${MANIFEST_TOML}
 system_prompt = '''
 ${SYSTEM_PROMPT}
@@ -82,17 +80,29 @@ agent_spawn = true
 agent_message = [\"*\"]
 "
 
-    # Send spawn request to API
+    # JSON-encode the TOML string for the API request
+    JSON_PAYLOAD=$(python3 -c "
+import sys, json
+toml = sys.stdin.read()
+print(json.dumps({'manifest_toml': toml}))
+" <<< "$MANIFEST_TOML" 2>/dev/null)
+
+    if [ -z "$JSON_PAYLOAD" ]; then
+        echo "WARNING: python3 not available, using fallback spawn method"
+        # Minimal fallback without the full prompt
+        JSON_PAYLOAD='{"manifest_toml": "name = \"shark-commander\"\nversion = \"1.0.0\"\ndescription = \"Shark Commander Brain\"\nauthor = \"leviathan\"\nmodule = \"builtin:chat\"\n\n[model]\nprovider = \"deepseek\"\nmodel = \"deepseek-reasoner\"\napi_key_env = \"DEEPSEEK_API_KEY\"\nmax_tokens = 8192\ntemperature = 0.1\nsystem_prompt = \"You are the Shark Commander.\"\n\n[resources]\nmax_llm_tokens_per_hour = 2000000\n\n[capabilities]\ntools = [\"agent_send\", \"agent_spawn\", \"memory_store\", \"memory_recall\", \"shell_exec\", \"http_request\"]\nmemory_read = [\"*\"]\nmemory_write = [\"*\"]\nagent_spawn = true\nagent_message = [\"*\"]\n"}'
+    fi
+
     SPAWN_RESULT=$(curl -sf -X POST "http://127.0.0.1:${PORT:-8080}/api/agents" \
         -H "Content-Type: application/json" \
-        -d "{\"manifest_toml\": $(echo "$MANIFEST_TOML" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))' 2>/dev/null || echo '""')}" 2>&1) || true
+        -d "$JSON_PAYLOAD" 2>&1) || true
 
     if echo "$SPAWN_RESULT" | grep -q "agent_id"; then
         echo "Shark Commander agent spawned successfully."
         echo "Result: $SPAWN_RESULT"
     else
         echo "WARNING: Agent spawn may have failed. Result: $SPAWN_RESULT"
-        echo "The server is still running — agent can be spawned manually."
+        echo "The server is still running — agent can be spawned manually via API."
     fi
 fi
 
