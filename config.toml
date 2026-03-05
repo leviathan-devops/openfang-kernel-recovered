@@ -1,14 +1,12 @@
-# OpenFang Agent OS — Leviathan HYDRA Pod Configuration v3.4
-# Supreme Commander: Emperor / Shark Commander
-# HYDRA Roster: Emperor, Architect, Scribe, Sentinel, Operator, Shark Commander
+# OpenFang Agent OS Configuration
 
 # API server settings for Railway deployment
-api_listen = "0.0.0.0:50051"
+api_listen = "0.0.0.0:4200"
 api_key = "leviathan-hydra-v3"
 
 [default_model]
 provider = "deepseek"
-model = "deepseek-reasoner"
+model = "deepseek-chat"
 api_key_env = "DEEPSEEK_API_KEY"
 max_tokens = 8192
 temperature = 0.3
@@ -16,19 +14,31 @@ temperature = 0.3
 [memory]
 decay_rate = 0.05
 
+[network]
+listen_addr = "0.0.0.0:4200"
+
+usage_footer = "Full"
+
 [compaction]
 threshold = 80
 keep_recent = 20
 max_summary_tokens = 1024
-
-usage_footer = "full"
-
-[discord]
-bot_token_env = "DISCORD_BOT_TOKEN"
-guild_ids = [1475947548811202613, 1477804209842815382]
+token_threshold_ratio = 0.7
+context_window_tokens = 200000
 
 [vault]
 master_key_env = "OPENFANG_VAULT_KEY"
+
+# Discord bot configuration
+[channels.discord]
+bot_token_env = "DISCORD_BOT_TOKEN"
+allowed_guilds = [1475947548811202613, 1477804209842815382]
+default_agent = "shark-commander"
+intents = 33280
+
+[channels.discord.overrides]
+dm_policy = "ignore"
+group_policy = "all"
 
 # Shark Commander Brain — DeepSeek R1 overseer agent
 [agent.shark-commander]
