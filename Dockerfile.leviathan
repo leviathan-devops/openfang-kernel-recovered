@@ -19,6 +19,7 @@ COPY Cargo.toml Cargo.lock rust-toolchain.toml ./
 COPY crates/ crates/
 COPY xtask/ xtask/
 COPY agents/ agents/
+COPY packages/ packages/
 
 # Build the leviathan-server binary in release mode
 RUN cargo build --release --bin leviathan-server \
