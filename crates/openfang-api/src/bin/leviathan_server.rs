@@ -4,7 +4,6 @@
 //! Boots the OpenFang kernel with Leviathan agent roster,
 //! starts the API server, and initializes the Discord bridge.
 
-use openfang_kernel::OpenFangKernel;
 use openfang_kernel::leviathan::LeviathanOS;
 use std::path::PathBuf;
 
@@ -72,12 +71,10 @@ fn main() {
         .expect("Failed to create Tokio runtime");
 
     rt.block_on(async {
-        // Extract kernel from LeviathanOS for the daemon
-        // We need to reconstruct since run_daemon takes ownership
-        let kernel = OpenFangKernel::boot(config_path.as_deref())
-            .expect("Second boot should not fail");
+        // Extract kernel Arc from LeviathanOS — avoid double boot
+        let kernel_arc = leviathan.kernel_arc();
 
-        if let Err(e) = openfang_api::server::run_daemon(kernel, &listen_addr, None).await {
+        if let Err(e) = openfang_api::server::run_daemon(kernel_arc, &listen_addr, None).await {
             tracing::error!("Daemon error: {}", e);
             std::process::exit(1);
         }

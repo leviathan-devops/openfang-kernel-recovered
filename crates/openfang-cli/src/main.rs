@@ -21,6 +21,7 @@ use openfang_types::agent::{AgentId, AgentManifest};
 use std::io::{self, BufRead, Write};
 use std::path::PathBuf;
 use std::sync::atomic::AtomicBool;
+use std::sync::Arc;
 #[cfg(windows)]
 use std::sync::atomic::Ordering;
 
@@ -1321,7 +1322,7 @@ fn cmd_start(config: Option<PathBuf>) {
         ui::blank();
 
         if let Err(e) =
-            openfang_api::server::run_daemon(kernel, &listen_addr, Some(&daemon_info_path)).await
+            openfang_api::server::run_daemon(Arc::new(kernel), &listen_addr, Some(&daemon_info_path)).await
         {
             ui::error(&format!("Daemon error: {e}"));
             std::process::exit(1);

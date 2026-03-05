@@ -286,6 +286,12 @@ impl LeviathanOS {
         &self.kernel
     }
 
+    /// Returns an Arc clone of the underlying OpenFang kernel.
+    /// Useful when you need to move the kernel into an async context.
+    pub fn kernel_arc(&self) -> Arc<OpenFangKernel> {
+        self.kernel.clone()
+    }
+
     /// Returns the Leviathan version string.
     pub fn version(&self) -> &str {
         &self.version

@@ -630,13 +630,11 @@ pub async fn build_router(
 ///
 /// This function blocks until Ctrl+C or a shutdown request.
 pub async fn run_daemon(
-    kernel: OpenFangKernel,
+    kernel: Arc<OpenFangKernel>,
     listen_addr: &str,
     daemon_info_path: Option<&Path>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let addr: SocketAddr = listen_addr.parse()?;
-
-    let kernel = Arc::new(kernel);
     kernel.set_self_handle();
     kernel.start_background_agents();
 
