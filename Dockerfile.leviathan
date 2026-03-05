@@ -20,6 +20,7 @@ COPY crates/ crates/
 COPY xtask/ xtask/
 COPY agents/ agents/
 COPY packages/ packages/
+COPY prompts/ prompts/
 
 # Build the leviathan-server binary in release mode
 RUN cargo build --release --bin leviathan-server \
@@ -32,6 +33,7 @@ FROM debian:bookworm-slim AS runtime
 RUN apt-get update && apt-get install -y \
     ca-certificates \
     libssl3 \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -39,11 +41,16 @@ WORKDIR /app
 # Copy the compiled binary
 COPY --from=builder /app/target/release/leviathan-server /app/leviathan-server
 
-# Copy agent definitions
+# Copy agent definitions and prompts
 COPY agents/ /app/agents/
+COPY prompts/ /app/prompts/
 
 # Copy config
 COPY config.toml /app/config.toml
+
+# Copy entrypoint script
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 # Create data directory
 RUN mkdir -p /app/data
@@ -53,15 +60,14 @@ ENV RUST_LOG=info
 ENV OPENFANG_CONFIG=/app/config.toml
 ENV OPENFANG_DATA_DIR=/app/data
 
-# Railway assigns PORT dynamically — server reads $PORT env var
-# Default to 50051 if not set (local development)
-ENV PORT=50051
+# Railway assigns PORT dynamically — leviathan-server reads $PORT env var
+ENV PORT=8080
 
 # Expose default port (Railway overrides dynamically)
-EXPOSE 50051
+EXPOSE 8080
 
 # Railway handles healthchecks externally via railway.toml
 # No Docker HEALTHCHECK needed — avoids port mismatch issues
 
-# Run the server
-CMD ["/app/leviathan-server"]
+# Run the entrypoint script (starts server + spawns agent on fresh DB)
+CMD ["/app/entrypoint.sh"]

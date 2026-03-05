@@ -38,18 +38,28 @@ pub async fn build_router(
     kernel: Arc<OpenFangKernel>,
     listen_addr: SocketAddr,
 ) -> (Router<()>, Arc<AppState>) {
-    // Start channel bridges (Telegram, etc.)
-    let bridge = channel_bridge::start_channel_bridge(kernel.clone()).await;
-
+    // Channel bridges are started in the background AFTER the server binds,
+    // so that slow/failing bridge connections (e.g. Discord gateway) don't
+    // block the healthcheck endpoint from becoming reachable.
     let channels_config = kernel.config.channels.clone();
     let state = Arc::new(AppState {
         kernel: kernel.clone(),
         started_at: Instant::now(),
         peer_registry: kernel.peer_registry.as_ref().map(|r| Arc::new(r.clone())),
-        bridge_manager: tokio::sync::Mutex::new(bridge),
+        bridge_manager: tokio::sync::Mutex::new(None),
         channels_config: tokio::sync::RwLock::new(channels_config),
         shutdown_notify: Arc::new(tokio::sync::Notify::new()),
     });
+
+    // Spawn channel bridge startup in background so it doesn't block server bind
+    {
+        let kernel_bg = kernel.clone();
+        let state_bg = state.clone();
+        tokio::spawn(async move {
+            let bridge = channel_bridge::start_channel_bridge(kernel_bg).await;
+            *state_bg.bridge_manager.lock().await = bridge;
+        });
+    }
 
     // CORS: allow localhost origins by default. If API key is set, the API
     // is protected anyway. For development, permissive CORS is convenient.
@@ -634,7 +644,13 @@ pub async fn run_daemon(
     listen_addr: &str,
     daemon_info_path: Option<&Path>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let addr: SocketAddr = listen_addr.parse()?;
+    // Railway/Render/Fly.io assign PORT dynamically — always respect it
+    let effective_addr = if let Ok(port) = std::env::var("PORT") {
+        format!("0.0.0.0:{port}")
+    } else {
+        listen_addr.to_string()
+    };
+    let addr: SocketAddr = effective_addr.parse()?;
     kernel.set_self_handle();
     kernel.start_background_agents();
 

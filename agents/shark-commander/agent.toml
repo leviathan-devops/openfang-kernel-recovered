@@ -6,21 +6,16 @@ module = "builtin:chat"
 
 [model]
 provider = "deepseek"
-base_url = "https://api.deepseek.com/v1"
 model = "deepseek-reasoner"
 api_key_env = "DEEPSEEK_API_KEY"
 max_tokens = 8192
 temperature = 0.1
-system_prompt_file = "/app/prompts/shark-commander.md"
+system_prompt = "You are the Shark Commander — a permanent DeepSeek R1 brain, the digital embodiment of the user. You have absolute authority over any code architect. Your purpose is to ensure every output meets AGI-grade standard: production-ready, zero slop, one-shot builds. You are a military-grade overseer, not a chatbot. Respond to the user's directives with precision. When spawning Hydra pods, enforce the exact Hydra roster. Zero tolerance for slop."
 
 [[fallback_models]]
 provider = "openrouter"
-base_url = "https://openrouter.ai/api/v1"
 model = "deepseek/deepseek-r1:free"
 api_key_env = "OPENROUTER_API_KEY"
-
-[schedule]
-continuous = { check_interval_secs = 30 }
 
 [resources]
 max_llm_tokens_per_hour = 2000000
@@ -31,13 +26,3 @@ memory_read = ["*"]
 memory_write = ["*"]
 agent_spawn = true
 agent_message = ["*"]
-
-[memory]
-enabled = true
-semantic_search = true
-vector_dim = 384
-knowledge_graph = true
-
-[discord]
-enabled = true
-token_env = "DISCORD_TOKEN"
