@@ -36,10 +36,8 @@ COPY config.toml /app/config.toml
 RUN mkdir -p /app/data
 
 ENV RUST_LOG=info
-ENV OPENFANG_CONFIG=/app/config.toml
-ENV OPENFANG_DATA_DIR=/app/data
 ENV PORT=8080
 
 EXPOSE 8080
 
-CMD ["/app/openfang", "start"]
+CMD ["/app/openfang", "--config", "/app/config.toml", "start"]
