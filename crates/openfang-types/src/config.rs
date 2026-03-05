@@ -1379,10 +1379,10 @@ pub struct DefaultModelConfig {
 impl Default for DefaultModelConfig {
     fn default() -> Self {
         Self {
-            provider: "anthropic".to_string(),
-            model: "claude-sonnet-4-20250514".to_string(),
-            api_key_env: "ANTHROPIC_API_KEY".to_string(),
-            base_url: None,
+            provider: "openrouter".to_string(),
+            model: "deepseek/deepseek-chat-v3-0324:free".to_string(),
+            api_key_env: "OPENROUTER_API_KEY".to_string(),
+            base_url: Some("https://openrouter.ai/api/v1".to_string()),
         }
     }
 }

@@ -22,9 +22,7 @@ threshold = 80
 keep_recent = 20
 max_summary_tokens = 1024
 
-[usage_footer]
-enabled = true
-format = "Full"
+usage_footer = "full"
 
 [discord]
 bot_token_env = "DISCORD_BOT_TOKEN"
