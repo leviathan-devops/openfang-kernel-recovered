@@ -4,7 +4,7 @@
 
 # API server settings for Railway deployment
 api_listen = "0.0.0.0:50051"
-api_key = ""
+api_key = "leviathan-hydra-v3"
 
 [default_model]
 provider = "openrouter"
