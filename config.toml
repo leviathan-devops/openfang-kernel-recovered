@@ -1,4 +1,5 @@
 # OpenFang Agent OS Configuration
+# Updated with all provider API keys
 
 # API server settings for Railway deployment
 api_listen = "0.0.0.0:4200"
@@ -10,6 +11,25 @@ model = "deepseek-chat"
 api_key_env = "DEEPSEEK_API_KEY"
 max_tokens = 8192
 temperature = 0.3
+
+# ─── LLM Provider Configurations ─────────────────────────────────────
+
+[providers.deepseek]
+base_url = "https://api.deepseek.com/v1"
+api_key_env = "DEEPSEEK_API_KEY"
+
+[providers.glm]
+base_url = "https://open.bigmodel.cn/api/paas/v4"
+api_key_env = "GLM_API_KEY"
+
+[providers.gemini]
+api_key_env = "GEMINI_API_KEY"
+
+[providers.openrouter]
+base_url = "https://openrouter.ai/api/v1"
+api_key_env = "OPENROUTER_API_KEY"
+
+# ─── Memory & Context ────────────────────────────────────────────────
 
 [memory]
 decay_rate = 0.05
@@ -29,7 +49,8 @@ context_window_tokens = 200000
 [vault]
 master_key_env = "OPENFANG_VAULT_KEY"
 
-# Discord bot configuration
+# ─── Discord Bot Configuration ────────────────────────────────────────
+
 [channels.discord]
 bot_token_env = "DISCORD_BOT_TOKEN"
 allowed_guilds = [1475947548811202613, 1477804209842815382]
@@ -39,6 +60,8 @@ intents = 33280
 [channels.discord.overrides]
 dm_policy = "ignore"
 group_policy = "all"
+
+# ─── Agent Configurations ─────────────────────────────────────────────
 
 # Shark Commander Brain — DeepSeek R1 overseer agent
 [agent.shark-commander]
