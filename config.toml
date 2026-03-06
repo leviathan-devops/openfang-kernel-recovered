@@ -18,9 +18,9 @@ temperature = 0.3
 base_url = "https://api.deepseek.com/v1"
 api_key_env = "DEEPSEEK_API_KEY"
 
-[providers.glm]
+[providers.zhipu]
 base_url = "https://open.bigmodel.cn/api/paas/v4"
-api_key_env = "GLM_API_KEY"
+api_key_env = "ZHIPU_API_KEY"
 
 [providers.gemini]
 api_key_env = "GEMINI_API_KEY"
